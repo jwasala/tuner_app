@@ -1,6 +1,5 @@
 from enum import Enum
 from models.constants import A4_PITCH, _12TH_ROOT_OF_2
-from models.sample import Sample
 
 
 class Note(Enum):
@@ -25,7 +24,7 @@ class Pitch:
         self.note = note
         self.octave = octave
 
-    def half_steps_from(self, other: 'Pitch'):
+    def half_steps_distance(self, other: 'Pitch'):
         """
         :return:
             Difference of half steps between two pitches, starting from the other.
@@ -35,7 +34,7 @@ class Pitch:
 
     @property
     def frequency(self) -> float:
-        return A4_PITCH * (_12TH_ROOT_OF_2 ** self.half_steps_from(Pitch(Note.A, 4)))
+        return A4_PITCH * (_12TH_ROOT_OF_2 ** self.half_steps_distance(Pitch(Note.A, 4)))
 
     @classmethod
     def from_frequency(cls, frequency: float) -> 'Pitch':
