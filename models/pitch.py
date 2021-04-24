@@ -1,5 +1,5 @@
 from enum import Enum
-from constants import A4_PITCH, _12TH_ROOT_OF_2
+from models.constants import A4_PITCH, _12TH_ROOT_OF_2
 
 
 class Note(Enum):

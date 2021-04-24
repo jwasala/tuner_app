@@ -1,5 +1,5 @@
 import numpy as np
-from pitch import Pitch
+from models.pitch import Pitch
 
 
 class Sample:
