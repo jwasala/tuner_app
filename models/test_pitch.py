@@ -4,9 +4,9 @@ from pitch import Pitch, Note
 
 class TestPitch(TestCase):
     def test_steps_from(self):
-        self.assertEqual(Pitch(Note.C, 5).steps_from(Pitch(Note.A, 4)), 3)
-        self.assertEqual(Pitch(Note.DSharp, 3).steps_from(Pitch(Note.DSharp, 1)), 24)
-        self.assertEqual(Pitch(Note.G, 4).steps_from(Pitch(Note.A, 3)), 10)
+        self.assertEqual(Pitch(Note.C, 5).half_steps_from(Pitch(Note.A, 4)), 3)
+        self.assertEqual(Pitch(Note.DSharp, 3).half_steps_from(Pitch(Note.DSharp, 1)), 24)
+        self.assertEqual(Pitch(Note.G, 4).half_steps_from(Pitch(Note.A, 3)), 10)
 
     def test_frequency(self):
         self.assertAlmostEqual(Pitch(Note.A, 4).frequency, 440, places=2)

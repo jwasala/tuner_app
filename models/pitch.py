@@ -1,5 +1,6 @@
 from enum import Enum
 from models.constants import A4_PITCH, _12TH_ROOT_OF_2
+from models.sample import Sample
 
 
 class Note(Enum):
@@ -24,9 +25,23 @@ class Pitch:
         self.note = note
         self.octave = octave
 
-    def steps_from(self, other: 'Pitch'):
+    def half_steps_from(self, other: 'Pitch'):
+        """
+        :return:
+            Difference of half steps between two pitches, starting from the other.
+            Positive number means that the other pitch is lower than the starting pitch.
+        """
         return self.note.value - other.note.value + len(Note) * (self.octave - other.octave)
 
     @property
     def frequency(self) -> float:
-        return A4_PITCH * (_12TH_ROOT_OF_2 ** self.steps_from(Pitch(Note.A, 4)))
+        return A4_PITCH * (_12TH_ROOT_OF_2 ** self.half_steps_from(Pitch(Note.A, 4)))
+
+    @classmethod
+    def from_frequency(cls, frequency: float) -> 'Pitch':
+        """
+        Constructs and returns Pitch object from frequency.
+
+        :returns: Estimated pitch for a given frequency.
+        """
+        return Pitch(Note.A, 4)

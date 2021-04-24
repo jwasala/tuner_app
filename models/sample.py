@@ -8,6 +8,3 @@ class Sample:
 
     def estimate_frequency(self) -> float:
         pass
-
-    def closest_pitch(self) -> Pitch:
-        pass
