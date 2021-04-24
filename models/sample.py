@@ -1,11 +1,13 @@
+import numpy as np
+from pitch import Pitch
+
+
 class Sample:
-    def __init__(self, data):
+    def __init__(self, data: np.ndarray):
         self.data = data
 
-    @property
-    def frequency(self):
+    def estimate_frequency(self) -> float:
         pass
 
-    @property
-    def closest_note(self):
+    def closest_pitch(self) -> Pitch:
         pass
