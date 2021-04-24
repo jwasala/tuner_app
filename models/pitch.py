@@ -25,7 +25,7 @@ class Pitch:
         self.octave = octave
 
     def steps_from(self, other: 'Pitch'):
-        return self.note - other.note + len(Note) * (self.octave - other.octave)
+        return self.note.value - other.note.value + len(Note) * (self.octave - other.octave)
 
     @property
     def frequency(self) -> float:
