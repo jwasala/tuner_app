@@ -1,12 +1,16 @@
+from typing import Callable
 import sounddevice as sd
 import numpy as np
-from typing import Callable
 from models.pitch import Pitch
 
 
 class Stream(sd.InputStream):
-    def device_to_stream_callback(self, in_data: np.ndarray, out_data: np.ndarray, frames, time, status):
+    def input_to_model(self, indata: np.ndarray, frames, time, status) -> None:
         pass
 
-    def __init__(self, stream_to_view_callback: Callable[[Pitch, float], None]):
-        super().__init__(callback=self.device_to_stream_callback)
+    def __init__(self, model_to_view: Callable[[Pitch, float], None]):
+        super().__init__(
+            callback=lambda indata, frames, time, status: self.input_to_model(indata, frames, time, status),
+            channels=1
+        )
+        self.model_to_view = model_to_view
