@@ -18,3 +18,9 @@ class TestPitch(TestCase):
         self.assertEqual(Pitch(Note.A, 1).shift(2), Pitch(Note.B, 1))
         self.assertEqual(Pitch(Note.CSharp, 5).shift(12), Pitch(Note.CSharp, 6))
         self.assertEqual(Pitch(Note.DSharp, 6).shift(-25), Pitch(Note.D, 4))
+
+    def test_from_frequency(self):
+        self.assertEqual(Pitch.from_frequency(442), Pitch(Note.A, 4))
+        self.assertEqual(Pitch.from_frequency(37), Pitch(Note.D, 1))
+        self.assertEqual(Pitch.from_frequency(112.25), Pitch(Note.A, 2))
+        self.assertEqual(Pitch.from_frequency(16.4), Pitch(Note.C, 0))

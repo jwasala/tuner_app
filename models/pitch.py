@@ -16,11 +16,12 @@ class Note(Enum):
     ASharp = 10
     B = 11
 
+    def __str__(self):
+        return self.name.replace('Sharp', '#')
+
 
 class Pitch:
     def __init__(self, note: Note, octave: int):
-        if octave < 0:
-            raise ValueError('Octave cannot be lower than 0')
         self.note = note
         self.octave = octave
 
@@ -36,7 +37,10 @@ class Pitch:
         """
         :return: Pitch that is higher or lower by a given number of half steps from the initial one.
         """
-        return None
+        note = Note((self.note.value + half_steps_distance) % len(Note))
+        octave = self.octave + ((self.note.value + half_steps_distance) // len(Note))
+
+        return Pitch(note, octave)
 
     @property
     def frequency(self) -> float:
@@ -48,8 +52,29 @@ class Pitch:
         Constructs and returns Pitch object from frequency.
 
         :return: Estimated pitch for a given frequency.
+
+        :raise: ValueError: if frequency is lower than 0.
         """
-        return None
+        if frequency < 0:
+            raise ValueError('Frequency cannot be lower than 0')
+
+        current = Pitch(Note.A, 4)
+
+        if frequency >= A4_PITCH:
+            next = Pitch(Note.ASharp, 4)
+            while not current.frequency <= frequency < next.frequency:
+                current = next
+                next = current.shift(1)
+        else:
+            next = Pitch(Note.GSharp, 4)
+            while not next.frequency < frequency <= current.frequency:
+                current = next
+                next = current.shift(-1)
+
+        if abs(next.frequency - frequency < current.frequency - frequency):
+            return next
+        else:
+            return current
 
     def __str__(self):
         return f"{self.note}{self.octave}"
