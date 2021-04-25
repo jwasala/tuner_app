@@ -24,13 +24,19 @@ class Pitch:
         self.note = note
         self.octave = octave
 
-    def half_steps_distance(self, other: 'Pitch'):
+    def half_steps_distance(self, other: 'Pitch') -> int:
         """
         :return:
             Difference of half steps between two pitches, starting from the other.
-            Positive number means that the other pitch is lower than the starting pitch.
+            Positive number means that the other pitch is lower than the initial one.
         """
         return self.note.value - other.note.value + len(Note) * (self.octave - other.octave)
+
+    def shift(self, half_steps_distance: int) -> 'Pitch':
+        """
+        :return: Pitch that is higher or lower by a given number of half steps from the initial one.
+        """
+        return None
 
     @property
     def frequency(self) -> float:
@@ -43,4 +49,25 @@ class Pitch:
 
         :return: Estimated pitch for a given frequency.
         """
-        return Pitch(Note.A, 4)
+        return None
+
+    def __str__(self):
+        return f"{self.note}{self.octave}"
+
+    def __lt__(self, other):
+        return self.octave < other.octave or (self.octave == other.octave and self.note.value < other.note.value)
+
+    def __le__(self, other):
+        return self.octave < other.octave or (self.octave == other.octave and self.note.value <= other.note.value)
+
+    def __gt__(self, other):
+        return self.octave > other.octave or (self.octave == other.octave and self.note.value > other.note.value)
+
+    def __ge__(self, other):
+        return self.octave > other.octave or (self.octave == other.octave and self.note.value >= other.note.value)
+
+    def __eq__(self, other):
+        return self.octave == other.octave and self.note.value == other.note.value
+
+    def __ne__(self, other):
+        return self.octave != other.octave or self.note.value != other.note.value
