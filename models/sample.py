@@ -1,5 +1,4 @@
 import numpy as np
-from models.pitch import Pitch
 
 
 class Sample:

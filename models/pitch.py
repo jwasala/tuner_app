@@ -41,6 +41,6 @@ class Pitch:
         """
         Constructs and returns Pitch object from frequency.
 
-        :returns: Estimated pitch for a given frequency.
+        :return: Estimated pitch for a given frequency.
         """
         return Pitch(Note.A, 4)
