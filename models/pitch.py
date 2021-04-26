@@ -1,4 +1,5 @@
 from enum import Enum
+from functools import total_ordering
 from models.constants import A4_PITCH, _12TH_ROOT_OF_2
 
 
@@ -20,6 +21,7 @@ class Note(Enum):
         return self.name.replace('Sharp', '#')
 
 
+@total_ordering
 class Pitch:
     def __init__(self, note: Note, octave: int):
         self.note = note
@@ -82,17 +84,5 @@ class Pitch:
     def __lt__(self, other):
         return self.octave < other.octave or (self.octave == other.octave and self.note.value < other.note.value)
 
-    def __le__(self, other):
-        return self.octave < other.octave or (self.octave == other.octave and self.note.value <= other.note.value)
-
-    def __gt__(self, other):
-        return self.octave > other.octave or (self.octave == other.octave and self.note.value > other.note.value)
-
-    def __ge__(self, other):
-        return self.octave > other.octave or (self.octave == other.octave and self.note.value >= other.note.value)
-
     def __eq__(self, other):
         return self.octave == other.octave and self.note.value == other.note.value
-
-    def __ne__(self, other):
-        return self.octave != other.octave or self.note.value != other.note.value
