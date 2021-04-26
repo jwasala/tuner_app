@@ -1,6 +1,7 @@
 from typing import Callable
 import sounddevice as sd
 import numpy as np
+from models.constants import BLOCK_SIZE, SAMPLING_RATE
 from models.pitch import Pitch
 
 
@@ -11,6 +12,8 @@ class Stream(sd.InputStream):
     def __init__(self, model_to_view: Callable[[Pitch, float], None]):
         super().__init__(
             callback=lambda indata, frames, time, status: self.input_to_model(indata, frames, time, status),
-            channels=1
+            channels=1,
+            samplerate=SAMPLING_RATE,
+            blocksize=BLOCK_SIZE
         )
         self.model_to_view = model_to_view
