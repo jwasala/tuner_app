@@ -1,4 +1,4 @@
-This is a multi-platform desktop tuner application with simple graphical interface.
+This is a multi-platform desktop tuner application with a simple graphical interface.
 
 Work is currently in progress. No stable version is available yet.
 
@@ -7,7 +7,7 @@ Work is currently in progress. No stable version is available yet.
 * Guided tuning of selected instruments (6-string guitar, ukulele, etc.) for each string.
 
 ### Tech stack
-Tuner App is written purely in Python with help of the following libraries:
+Tuner App is written purely in Python. Used libraries include:
 * numpy
 * scipy
 * sounddevice
