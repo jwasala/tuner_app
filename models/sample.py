@@ -28,7 +28,7 @@ class Sample:
 
         return dft[:len(dft) // 2]
 
-    def noise_reducted_discrete_fourier_transform(self) -> np.ndarray:
+    def noise_reduced_discrete_fourier_transform(self) -> np.ndarray:
         """
         Transforms sample data from displacement domain to frequency domain.
         After that, various noise reduction techniques are applied in order to enhance signal.
