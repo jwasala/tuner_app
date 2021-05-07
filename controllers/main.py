@@ -6,8 +6,12 @@ def model_to_view(pitch: Pitch, freq: float) -> None:
     print(pitch, freq, 'Hz')
 
 
-stream = Stream(model_to_view)
-stream.start()
+def main():
+    stream = Stream(model_to_view)
+    stream.start()
 
-while True:
-    pass
+    input('Press any key to exit')
+
+
+if __name__ == '__main__':
+    main()
