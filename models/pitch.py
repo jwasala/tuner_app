@@ -1,6 +1,6 @@
 from enum import Enum
 from functools import total_ordering
-from models.constants import A4_PITCH, _12TH_ROOT_OF_2
+from models.constants import A4_PITCH, _12TH_ROOT_OF_2, ERROR_MARGIN
 
 
 class Note(Enum):
@@ -43,6 +43,12 @@ class Pitch:
         octave = self.octave + ((self.note.value + half_steps_distance) // len(Note))
 
         return Pitch(note, octave)
+
+    def is_within_error_margin(self, freq: float) -> bool:
+        left_error_margin = self.frequency - (self.frequency - self.shift(-1).frequency) * ERROR_MARGIN
+        right_error_margin = self.frequency + (self.shift(1).frequency - self.frequency) * ERROR_MARGIN
+
+        return left_error_margin < freq < right_error_margin
 
     @property
     def frequency(self) -> float:
