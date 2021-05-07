@@ -2,7 +2,7 @@ from models.stream import Stream, TuningStatus
 
 
 def update_view(ts: TuningStatus) -> None:
-    print(ts.closest_pitch, ts.freq, 'Hz', [(str(p), b) for (p, b) in ts.strings])
+    print(ts.closest_pitch, ts.freq, 'Hz', f'({ts.freq_diff})', [(str(p), b) for (p, b) in ts.strings])
 
 
 def main():
