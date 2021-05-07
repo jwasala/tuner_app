@@ -9,9 +9,10 @@ from models.sample import Sample
 class Stream(sd.InputStream):
     def input_to_model(self, indata: np.ndarray, frames, time, status) -> None:
         sample = Sample(indata)
-        freq = np.argmax(sample.discrete_fourier_transform()) * (SAMPLING_RATE / BLOCK_SIZE)
+        freq = np.argmax(sample.discrete_fourier_transform())
         pitch = Pitch.from_frequency(freq)
-        print(pitch, '-', freq)
+
+        self.model_to_view(pitch, freq)
 
     def __init__(self, model_to_view: Callable[[Pitch, float], None]):
         super().__init__(
