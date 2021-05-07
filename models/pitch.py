@@ -79,7 +79,7 @@ class Pitch:
                 current = next
                 next = current.shift(-1)
 
-        if abs(next.frequency - frequency < current.frequency - frequency):
+        if abs(next.frequency - frequency) < abs (current.frequency - frequency):
             return next
         else:
             return current

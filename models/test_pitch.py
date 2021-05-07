@@ -24,3 +24,4 @@ class TestPitch(TestCase):
         self.assertEqual(Pitch.from_frequency(37), Pitch(Note.D, 1))
         self.assertEqual(Pitch.from_frequency(112.25), Pitch(Note.A, 2))
         self.assertEqual(Pitch.from_frequency(16.4), Pitch(Note.C, 0))
+        self.assertEqual(Pitch.from_frequency(109), Pitch(Note.A, 2))
