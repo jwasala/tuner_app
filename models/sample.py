@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.fftpack
-from models.constants import SAMPLING_RATE
+from models.constants import SAMPLING_RATE, LOW_FREQUENCY, HIGH_FREQUENCY
 
 
 class Sample:
@@ -18,22 +18,19 @@ class Sample:
         """
         return np.sum([x ** 2 for x in self.data]) / len(self.data)
 
-    def simple_discrete_fourier_transform(self) -> np.ndarray:
+    def discrete_fourier_transform(self) -> np.ndarray:
         """
-        Transforms sample data from displacement domain to frequency domain without noise reduction.
+        Transforms sample data from displacement domain to frequency domain.
         """
         window = np.hanning(len(self.data))
         flat_data = self.data.flatten()
         dft = abs(scipy.fftpack.fft(flat_data * window))
 
-        return dft[:len(dft) // 2]
+        # ignore hum
+        for i in range(LOW_FREQUENCY):
+            dft[i] = 0
 
-    def noise_reduced_discrete_fourier_transform(self) -> np.ndarray:
-        """
-        Transforms sample data from displacement domain to frequency domain.
-        After that, various noise reduction techniques are applied in order to enhance signal.
-        """
-        pass
+        return dft[:min(len(dft) // 2, HIGH_FREQUENCY)]
 
     def harmonic_product_spectrum(self) -> float:
         """

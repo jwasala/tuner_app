@@ -3,11 +3,15 @@ import sounddevice as sd
 import numpy as np
 from models.constants import BLOCK_SIZE, SAMPLING_RATE
 from models.pitch import Pitch
+from models.sample import Sample
 
 
 class Stream(sd.InputStream):
     def input_to_model(self, indata: np.ndarray, frames, time, status) -> None:
-        pass
+        sample = Sample(indata)
+        freq = np.argmax(sample.discrete_fourier_transform()) * (SAMPLING_RATE / BLOCK_SIZE)
+        pitch = Pitch.from_frequency(freq)
+        print(pitch, '-', freq)
 
     def __init__(self, model_to_view: Callable[[Pitch, float], None]):
         super().__init__(
