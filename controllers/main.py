@@ -1,19 +1,16 @@
-from controllers.stream import Stream
-from models.pitch import Pitch
+from models.stream import Stream, TuningStatus
 
 
-class App:
-    @classmethod
-    def model_to_view(cls, pitch: Pitch, freq: float) -> None:
-        print(pitch, freq, 'Hz')
+def update_view(ts: TuningStatus) -> None:
+    print(ts.closest_pitch, ts.freq, 'Hz', [(str(p), b) for (p, b) in ts.strings])
 
-    @classmethod
-    def main(cls):
-        stream = Stream(cls.model_to_view)
-        stream.start()
 
-        input('Press any key to exit')
+def main():
+    stream = Stream(update_view)
+    stream.start()
+
+    input('Press any key to exit\n')
 
 
 if __name__ == '__main__':
-    App.main()
+    main()
