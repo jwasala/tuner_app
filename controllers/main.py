@@ -3,7 +3,7 @@ from models.pitch import Pitch
 
 
 def model_to_view(pitch: Pitch, freq: float) -> None:
-    print(pitch, freq)
+    print(pitch, freq, 'Hz')
 
 
 stream = Stream(model_to_view)

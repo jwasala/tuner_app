@@ -10,6 +10,10 @@ class Stream(sd.InputStream):
     def input_to_model(self, indata: np.ndarray, frames, time, status) -> None:
         sample = Sample(indata)
         freq = np.argmax(sample.discrete_fourier_transform())
+
+        if type(freq) == np.ndarray:
+            freq = freq[0]
+
         pitch = Pitch.from_frequency(freq)
 
         self.model_to_view(pitch, freq)
