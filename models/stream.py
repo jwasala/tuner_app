@@ -5,27 +5,7 @@ import numpy as np
 from models.constants import BLOCK_SIZE, SAMPLING_RATE, SECONDS_TO_TUNE
 from models.pitch import Pitch, Note
 from models.sample import Sample
-
-TUNINGS = {
-    'guitar': {
-        'standard': [
-            Pitch(Note.E, 2),
-            Pitch(Note.A, 2),
-            Pitch(Note.D, 3),
-            Pitch(Note.G, 3),
-            Pitch(Note.B, 3),
-            Pitch(Note.E, 4)
-        ],
-        'half-step down': [
-            Pitch(Note.DSharp, 2),
-            Pitch(Note.GSharp, 2),
-            Pitch(Note.CSharp, 3),
-            Pitch(Note.FSharp, 3),
-            Pitch(Note.ASharp, 3),
-            Pitch(Note.DSharp, 4)
-        ]
-    }
-}
+from models.tunings import TUNINGS
 
 
 @dataclass
@@ -40,14 +20,11 @@ class Stream(sd.InputStream):
 
     def read_input(self, indata: np.ndarray, frames, time, status) -> None:
         sample = Sample(indata)
-
-        freq = np.argmax(sample.discrete_fourier_transform())
-
-        if type(freq) == np.ndarray:
-            freq = freq[0]
+        freq = sample.harmonic_product_spectrum()
 
         pitch = Pitch.from_frequency(freq)
 
+        # update progress of tuning string if pitch matches with the string
         if pitch.is_within_error_margin(freq):
             for i in range(len(self.strings_status)):
                 if self.strings_status[i][0] == pitch:

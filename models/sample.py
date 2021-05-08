@@ -38,4 +38,10 @@ class Sample:
 
         :return: Estimated frequency.
         """
-        pass
+        # mock implementation, not really HPS
+        freq = np.argmax(self.discrete_fourier_transform())
+
+        if type(freq) == np.ndarray:
+            freq = freq[0]
+
+        return freq
