@@ -3,7 +3,7 @@ from typing import Callable, List, Tuple
 import sounddevice as sd
 import numpy as np
 from models.constants import BLOCK_SIZE, SAMPLING_RATE, SECONDS_TO_TUNE
-from models.pitch import Pitch, Note
+from models.pitch import Pitch
 from models.sample import Sample
 from models.tunings import TUNINGS
 
