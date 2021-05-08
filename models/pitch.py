@@ -1,6 +1,6 @@
 from enum import Enum
 from functools import total_ordering
-from models.constants import A4_PITCH, _12TH_ROOT_OF_2, ERROR_MARGIN
+from models.constants import A4_FREQ, _12TH_ROOT_OF_2, ERROR_MARGIN
 
 
 class Note(Enum):
@@ -52,7 +52,7 @@ class Pitch:
 
     @property
     def frequency(self) -> float:
-        return A4_PITCH * (_12TH_ROOT_OF_2 ** self.half_steps_distance(Pitch(Note.A, 4)))
+        return A4_FREQ * (_12TH_ROOT_OF_2 ** self.half_steps_distance(Pitch(Note.A, 4)))
 
     @classmethod
     def from_frequency(cls, frequency: float) -> 'Pitch':
@@ -68,7 +68,7 @@ class Pitch:
 
         current = Pitch(Note.A, 4)
 
-        if frequency >= A4_PITCH:
+        if frequency >= A4_FREQ:
             next = Pitch(Note.ASharp, 4)
             while not current.frequency <= frequency < next.frequency:
                 current = next
