@@ -7,7 +7,7 @@ _12TH_ROOT_OF_2 = 1.05946309436
 SAMPLING_RATE = 44100
 """Indicates how many samples are taken from input stream in a second."""
 
-BLOCK_SIZE = 44100
+BLOCK_SIZE = 2205
 """Indicates how often a callback function is called by the stream (as a number of samples passed with each call)."""
 
 HIGH_FREQUENCY = 700
@@ -16,9 +16,15 @@ HIGH_FREQUENCY = 700
 LOW_FREQUENCY = 80
 """Lowest frequency considered when estimating sound frequency."""
 
-SECONDS_TO_TUNE = 4
+SECONDS_TO_TUNE = 8
 """Indicates how long input sound's frequency have to fit within error margin of a string's pitch in order to 
 consider that string to in tune. """
 
 ERROR_MARGIN = 0.1
 """Indicates how wide is the interval of accepted frequencies around perfect frequency of a tone."""
+
+BACKLOG_SIZE = 20
+
+SUPPRESSION_FACTOR = 0.9
+
+MAX_DOWNSAMPLING = 4

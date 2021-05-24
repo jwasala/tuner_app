@@ -1,0 +1,41 @@
+#:kivy 1.0.9
+
+<TunerWindow>:
+
+    canvas.before:
+        Color:
+            rgba: 0.1529, 0.1882, 0.2627, 1
+        Rectangle:
+            pos: root.pos
+            size: root.size
+
+    canvas:
+        Color:
+            rgba: (0.941, 0.176, 0.227, 1) if root.freq_diff_regularized < 0 else (0.568, 0.592, 0.164, 1)
+        Rectangle:
+            pos: 400, 275
+            size: 400 * root.freq_diff_regularized, 10
+
+    Label:
+        color: 0.9372, 0.9647, 0.9333, 1
+        font_size: 120
+        font_name: 'Roboto'
+        center_x: root.width * 2 / 4
+        top: root.top - 50
+        text: ("%.2f" % root.freq) + ' Hz'
+
+    Label:
+        color: 0.9372, 0.9647, 0.9333, 1
+        font_size: 60
+        font_name: 'Roboto'
+        center_x: root.width * 2 / 4
+        top: root.top - 200
+        text: str(root.pitch)
+
+    Label:
+        color: 0.5, 0.5, 0.5, 1
+        font_size: 30
+        font_name: 'Roboto'
+        center_x: root.width * 2 / 4
+        top: root.top - 350
+        text: str([(str(pitch), freq) for pitch, freq in zip(root.pitches, root.tune_statuses)])

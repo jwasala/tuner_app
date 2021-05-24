@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.fftpack
-from models.constants import SAMPLING_RATE, LOW_FREQUENCY, HIGH_FREQUENCY
+from models.constants import SAMPLING_RATE, LOW_FREQUENCY, HIGH_FREQUENCY, MAX_DOWNSAMPLING
 
 
 class Sample:
@@ -23,8 +23,7 @@ class Sample:
         Transforms sample data from displacement domain to frequency domain.
         """
         window = np.hanning(len(self.data))
-        flat_data = self.data.flatten()
-        dft = abs(scipy.fftpack.fft(flat_data * window))
+        dft = abs(scipy.fftpack.fft(self.data * window))
 
         # ignore hum
         for i in range(LOW_FREQUENCY):
@@ -32,16 +31,15 @@ class Sample:
 
         return dft[:min(len(dft) // 2, HIGH_FREQUENCY)]
 
-    def harmonic_product_spectrum(self) -> float:
+    def estimate_frequency(self) -> float:
         """
-        Estimates frequency of the sample using Harmonic Product Spectrum.
+        Estimates frequency for a given sample.
+        """
+        dft = self.discrete_fourier_transform()
 
-        :return: Estimated frequency.
-        """
-        # mock implementation, not really HPS
-        freq = np.argmax(self.discrete_fourier_transform())
+        freq = np.argmax(dft)
 
         if type(freq) == np.ndarray:
             freq = freq[0]
 
-        return freq
+        return freq * (SAMPLING_RATE / len(self.data))
