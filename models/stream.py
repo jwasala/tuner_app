@@ -13,6 +13,7 @@ class TuningStatus:
     closest_pitch: Pitch
     freq: float
     freq_diff: float
+    freq_diff_normalized: float
     strings: List[Tuple[Pitch, float]]
 
 
@@ -31,7 +32,9 @@ class Stream(sd.InputStream):
                     self.strings_status[i] = (
                         pitch, min(1, self.strings_status[i][1] + (BLOCK_SIZE / (SAMPLING_RATE * SECONDS_TO_TUNE))))
 
-        self.update_view(TuningStatus(pitch, freq, freq - pitch.frequency, self.strings_status))
+        self.update_view(TuningStatus(pitch, freq, freq - pitch.frequency,
+                                      (freq - pitch.frequency) * 2 / (pitch.frequency - pitch.shift(-1).frequency),
+                                      self.strings_status))
 
     def __init__(self, update_view: Callable[[TuningStatus], None]):
         super().__init__(

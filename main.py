@@ -104,13 +104,32 @@ class Ui_MainWindow(object):
 
         self.buttons.addLayout(self.buttons_row2)
 
+        self.over_tone = QFrame(self.centralwidget)
+        self.over_tone.setObjectName(u"over_tone")
+        self.over_tone.setGeometry(QRect(350, 276, 301, 20))
+        self.over_tone.setAutoFillBackground(True)
+        self.over_tone.setStyleSheet(u"#over_tone {\n"
+                                     "	color: rgb(98, 139, 72);\n"
+                                     "}")
+        self.over_tone.setFrameShadow(QFrame.Plain)
+        self.over_tone.setLineWidth(20)
+        self.over_tone.setFrameShape(QFrame.HLine)
+        self.under_tone = QFrame(self.centralwidget)
+        self.under_tone.setObjectName(u"under_tone")
+        self.under_tone.setGeometry(QRect(50, 276, 301, 20))
+        self.under_tone.setAutoFillBackground(True)
+        self.under_tone.setStyleSheet(u"#under_tone {\n"
+                                      "	color: rgba(237, 37,78, 255);\n"
+                                      "}")
+        self.under_tone.setFrameShadow(QFrame.Plain)
+        self.under_tone.setLineWidth(20)
+        self.under_tone.setFrameShape(QFrame.HLine)
+
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
 
         QMetaObject.connectSlotsByName(MainWindow)
-
-    # setupUi
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Tuner", None))
@@ -122,11 +141,9 @@ class Ui_MainWindow(object):
         self.mandolin_standard.setText(QCoreApplication.translate("MainWindow", u"Mandolin standard", None))
         self.bass_four_string.setText(QCoreApplication.translate("MainWindow", u"4-string bass", None))
         self.ukulele_baritone.setText(QCoreApplication.translate("MainWindow", u"Baritone ukulele", None))
-    # retranslateUi
 
 
 def main():
-
     app = QApplication(sys.argv)
     win = Ui_MainWindow()
     w = QMainWindow()
@@ -137,6 +154,19 @@ def main():
         print(ts.closest_pitch, ts.freq, 'Hz', f'({ts.freq_diff})', [(str(p), b) for (p, b) in ts.strings])
         win.freq.setText("%.1f" % ts.freq + ' Hz')
         win.closest_pitch.setText(str(ts.closest_pitch))
+
+        if ts.freq_diff == 0:
+            win.over_tone.resize(0, win.over_tone.height())
+            win.under_tone.resize(0, win.under_tone.height())
+
+        if ts.freq_diff > 0:
+            win.over_tone.setGeometry(350, 276, int(301 * abs(ts.freq_diff_normalized)), 20)
+            win.under_tone.resize(0, win.under_tone.height())
+
+        if ts.freq_diff < 0:
+            win.under_tone.setGeometry(50 + (301 - int(301 * abs(ts.freq_diff_normalized))), 276,
+                                       int(301 * abs(ts.freq_diff_normalized)), 20)
+            win.over_tone.resize(0, win.under_tone.height())
 
     stream = Stream(update_view)
     stream.start()
