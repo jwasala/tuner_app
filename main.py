@@ -1,11 +1,15 @@
 from models.stream import Stream, TuningStatus
+from models.tunings import TUNINGS
+import sys
 from PySide2.QtCore import (QCoreApplication, QMetaObject, QObject, QPoint,
-                            QRect, QSize, QUrl, Qt)
+                            QRect, QSize, QUrl, Qt, Signal)
 from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
                            QFontDatabase, QIcon, QLinearGradient, QPalette, QPainter, QPixmap,
                            QRadialGradient)
 from PySide2.QtWidgets import *
-import sys
+
+
+
 
 
 class Ui_MainWindow(object):
@@ -53,13 +57,13 @@ class Ui_MainWindow(object):
         self.buttons_grid.setObjectName(u"buttons_grid")
         self.buttons_grid.setGeometry(QRect(50, 425, 601, 126))
         self.buttons_grid.setStyleSheet(u"#buttons_grid QPushButton {\n"
-                                        "	background: rgba(237, 37, 78, 1);\n"
-                                        "	border: 0;\n"
-                                        "	border-radius: 10px;\n"
-                                        "	font: 15px 'Montserrat';\n"
+                                        "	background: rgba(237, 37, 78, 0.3);\n"
+                                        "	border: 1px solid rgba(237, 37, 78, 0.5);\n"
+                                        "	border-radius: 16px;\n"
+                                        "	font: 14px 'Montserrat';\n"
                                         "	font-weight: 450;\n"
                                         "	margin: 5px;\n"
-                                        "	padding: 3px 5px;\n"
+                                        "	padding: 8px 5px;\n"
                                         "}\n"
                                         "#buttons_grid QPushButton:pressed {\n"
                                         "	background: rgba(237, 37, 78, 0.8);\n"
@@ -68,6 +72,11 @@ class Ui_MainWindow(object):
         self.buttons.setObjectName(u"buttons")
         self.buttons_row1 = QHBoxLayout()
         self.buttons_row1.setObjectName(u"buttons_row1")
+
+        self.guitar_st = QPushButton(self.buttons_grid)
+        self.guitar_st.setObjectName(u"guitar_st")
+
+        self.buttons_row1.addWidget(self.guitar_st)
         self.ukulele_soprano = QPushButton(self.buttons_grid)
         self.ukulele_soprano.setObjectName(u"ukulele_soprano")
 
@@ -77,11 +86,6 @@ class Ui_MainWindow(object):
         self.guitar_half_down.setObjectName(u"guitar_half_down")
 
         self.buttons_row1.addWidget(self.guitar_half_down)
-
-        self.guitar_st = QPushButton(self.buttons_grid)
-        self.guitar_st.setObjectName(u"guitar_st")
-
-        self.buttons_row1.addWidget(self.guitar_st)
 
         self.buttons.addLayout(self.buttons_row1)
 
@@ -125,6 +129,67 @@ class Ui_MainWindow(object):
         self.under_tone.setLineWidth(20)
         self.under_tone.setFrameShape(QFrame.HLine)
 
+        self.strings_grid = QWidget(self.centralwidget)
+        self.strings_grid.setObjectName(u"strings_grid")
+        self.strings_grid.setGeometry(QRect(50, 304, 601, 126))
+        self.strings_grid.setStyleSheet(u"#strings_grid QPushButton {\n"
+                                        "	background: rgba(98, 139, 72, 0.3);\n"
+                                        "	border: 1px solid rgb(98, 139, 72);\n"
+                                        "	border-radius: 17px;\n"
+                                        "	font: 14px 'Montserrat';\n"
+                                        "	font-weight: 450;\n"
+                                        "	margin: 15px;\n"
+                                        "	padding: 10px;\n"
+                                        "}")
+
+        self.strings = QHBoxLayout(self.strings_grid)
+        self.strings.setObjectName(u"strings")
+        self.strings.setContentsMargins(9, 9, 9, 9)
+        self.string_1 = QPushButton(self.strings_grid)
+        self.string_1.setObjectName(u"string_1")
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.string_1.sizePolicy().hasHeightForWidth())
+        self.string_1.setSizePolicy(sizePolicy)
+
+        self.strings.addWidget(self.string_1)
+
+        self.string_2 = QPushButton(self.strings_grid)
+        self.string_2.setObjectName(u"string_2")
+        sizePolicy.setHeightForWidth(self.string_2.sizePolicy().hasHeightForWidth())
+        self.string_2.setSizePolicy(sizePolicy)
+
+        self.strings.addWidget(self.string_2)
+
+        self.string_3 = QPushButton(self.strings_grid)
+        self.string_3.setObjectName(u"string_3")
+        sizePolicy.setHeightForWidth(self.string_3.sizePolicy().hasHeightForWidth())
+        self.string_3.setSizePolicy(sizePolicy)
+
+        self.strings.addWidget(self.string_3)
+
+        self.string_4 = QPushButton(self.strings_grid)
+        self.string_4.setObjectName(u"string_4")
+        sizePolicy.setHeightForWidth(self.string_4.sizePolicy().hasHeightForWidth())
+        self.string_4.setSizePolicy(sizePolicy)
+
+        self.strings.addWidget(self.string_4)
+
+        self.string_5 = QPushButton(self.strings_grid)
+        self.string_5.setObjectName(u"string_5")
+        sizePolicy.setHeightForWidth(self.string_5.sizePolicy().hasHeightForWidth())
+        self.string_5.setSizePolicy(sizePolicy)
+
+        self.strings.addWidget(self.string_5)
+
+        self.string_6 = QPushButton(self.strings_grid)
+        self.string_6.setObjectName(u"string_6")
+        sizePolicy.setHeightForWidth(self.string_6.sizePolicy().hasHeightForWidth())
+        self.string_6.setSizePolicy(sizePolicy)
+
+        self.strings.addWidget(self.string_6)
+
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -141,10 +206,16 @@ class Ui_MainWindow(object):
         self.mandolin_standard.setText(QCoreApplication.translate("MainWindow", u"Mandolin standard", None))
         self.bass_four_string.setText(QCoreApplication.translate("MainWindow", u"4-string bass", None))
         self.ukulele_baritone.setText(QCoreApplication.translate("MainWindow", u"Baritone ukulele", None))
+        self.string_1.setText(QCoreApplication.translate("MainWindow", u"E2", None))
+        self.string_2.setText(QCoreApplication.translate("MainWindow", u"A2", None))
+        self.string_3.setText(QCoreApplication.translate("MainWindow", u"D3", None))
+        self.string_4.setText(QCoreApplication.translate("MainWindow", u"G3", None))
+        self.string_5.setText(QCoreApplication.translate("MainWindow", u"B3", None))
+        self.string_6.setText(QCoreApplication.translate("MainWindow", u"E4", None))
 
 
 def main():
-    app = QApplication(sys.argv)
+    app = QApplication()
     win = Ui_MainWindow()
     w = QMainWindow()
     win.setupUi(w)
@@ -168,11 +239,76 @@ def main():
                                        int(301 * abs(ts.freq_diff_normalized)), 20)
             win.over_tone.resize(0, win.under_tone.height())
 
+        if len(ts.strings) == 4:
+            win.string_1.hide()
+            win.string_6.hide()
+
+            i = 2
+            for (pitch, freq) in ts.strings:
+                getattr(win, f'string_{i}').setText(str(pitch))
+                getattr(win, f'string_{i}').setStyleSheet(u"#string_" + str(i) + " {\n"
+                                        "	background: qlineargradient(spread:pad, x1:0.5, y1:" + "%.2f" % (1 - freq) + ", x2:0.5, y2:1, stop:0 rgba(98, 139, 72, 0.3), stop:0.001 rgba(98, 139, 72, 1));\n"
+                                        "}")
+                i += 1
+
+        if len(ts.strings) == 6:
+            win.string_1.show()
+            win.string_6.show()
+
+            i = 1
+            for (pitch, freq) in ts.strings:
+                getattr(win, f'string_{i}').setText(str(pitch))
+                getattr(win, f'string_{i}').setStyleSheet(u"#string_" + str(i) + " {\n"
+                                        "	background: qlineargradient(spread:pad, x1:0.5, y1:" + "%.2f" % (1 - freq) + ", x2:0.5, y2:1, stop:0 rgba(98, 139, 72, 0.3), stop:0.001 rgba(98, 139, 72, 1));\n"
+                                        "}")
+                i += 1
+
     stream = Stream(update_view)
     stream.start()
 
-    sys.exit(app.exec_())
+    def on_guitar_st_click(but):
+        return stream.update_instrument(TUNINGS['guitar standard'])
+
+    def on_guitar_half_down_click(but):
+        return stream.update_instrument(TUNINGS['guitar half-step down'])
+
+    def on_mandolin_standard_click(but):
+        return stream.update_instrument(TUNINGS['mandolin standard'])
+
+    def on_ukulele_soprano_click(but):
+        return stream.update_instrument(TUNINGS['soprano ukulele'])
+
+    def on_ukulele_baritone_click(but):
+        return stream.update_instrument(TUNINGS['baritone ukulele'])
+
+    def on_bass_four_string(but):
+        return stream.update_instrument(TUNINGS['4-string bass'])
+
+    win.guitar_st.clicked.connect(on_guitar_st_click)
+    win.guitar_half_down.clicked.connect(on_guitar_half_down_click)
+    win.mandolin_standard.clicked.connect(on_mandolin_standard_click)
+    win.ukulele_soprano.clicked.connect(on_ukulele_soprano_click)
+    win.ukulele_baritone.clicked.connect(on_ukulele_baritone_click)
+    win.bass_four_string.clicked.connect(on_bass_four_string)
+
+    try:
+        sys.exit(app.exec_())
+    except:
+        print('Exiting')
 
 
 if __name__ == '__main__':
+    sys._excepthook = sys.excepthook
+
+    def my_exception_hook(exctype, value, traceback):
+        # Print the error and traceback
+        print(exctype, value, traceback)
+        # Call the normal Exception hook after
+        sys._excepthook(exctype, value, traceback)
+        sys.exit(1)
+
+
+    # Set the exception hook to our wrapping function
+    sys.excepthook = my_exception_hook
+
     main()
