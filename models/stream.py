@@ -36,15 +36,18 @@ class Stream(sd.InputStream):
 
         pitch = Pitch.from_frequency(freq)
 
-        # update progress of tuning string if pitch matches with the string
         if pitch.is_within_error_margin(freq):
             for i in range(len(self.strings)):
                 if self.strings[i] == pitch:
                     self.tunings[i] = min(1, self.tunings[i] + (BLOCK_SIZE / (SAMPLING_RATE * SECONDS_TO_TUNE)))
 
-        self.update_view(TuningStatus(pitch, freq, freq - pitch.frequency,
-                                      (freq - pitch.frequency) * 2 / (pitch.frequency - pitch.shift(-1).frequency),
-                                      [(self.strings[i], self.tunings[i]) for i in range(len(self.strings))]))
+        self.update_view(TuningStatus(
+            closest_pitch=pitch,
+            freq=freq,
+            freq_diff=freq - pitch.frequency,
+            freq_diff_normalized=(freq - pitch.frequency) * 2 / (pitch.frequency - pitch.shift(-1).frequency),
+            strings=[(self.strings[i], self.tunings[i]) for i in range(len(self.strings))])
+        )
 
     def __init__(self, update_view: Callable[[TuningStatus], None]):
         super().__init__(
