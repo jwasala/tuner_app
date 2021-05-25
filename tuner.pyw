@@ -166,6 +166,7 @@ class MainWindow(QMainWindow):
                 font-family: 'Montserrat';
                 font-size: 90px;
                 font-weight: 700;
+                margin: 0 auto;
             }
             """
         )

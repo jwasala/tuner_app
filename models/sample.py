@@ -1,7 +1,9 @@
+import copy
+
 import numpy as np
 import scipy.fftpack
-from models.constants import SAMPLING_RATE, LOW_FREQUENCY, HIGH_FREQUENCY
-
+from models.constants import SAMPLING_RATE, LOW_FREQUENCY, HIGH_FREQUENCY, MAX_DOWNSAMPLING
+import matplotlib.pyplot as plt
 
 class Sample:
     def __init__(self, data: np.ndarray):
@@ -26,22 +28,37 @@ class Sample:
         flat_data = self.data.flatten()
         dft = abs(scipy.fftpack.fft(flat_data * window))
 
-        # ignore hum
         for i in range(LOW_FREQUENCY):
             dft[i] = 0
 
         return dft[:min(len(dft) // 2, HIGH_FREQUENCY)]
 
-    def harmonic_product_spectrum(self) -> float:
+    def harmonic_product_spectrum(self, simple=False) -> float:
         """
         Estimates frequency of the sample using Harmonic Product Spectrum.
 
         :return: Estimated frequency.
         """
-        # mock implementation, not really HPS
-        freq = np.argmax(self.discrete_fourier_transform())
+        if simple:
+            freq = np.argmax(self.discrete_fourier_transform())
+        else:
+            window = np.hanning(len(self.data))
+            flat_data = self.data.flatten()
+            dft = abs(scipy.fftpack.fft(flat_data * window))
 
-        if type(freq) == np.ndarray:
-            freq = freq[0]
+            # ignore hum
+            for i in range(LOW_FREQUENCY):
+                dft[i] = 0
+            dft = dft[:len(dft) // 2]
+
+            dft_copy = copy.deepcopy(dft)
+
+            for i in range(MAX_DOWNSAMPLING):
+                dft_copy = np.multiply(dft_copy[:int(np.ceil(len(dft_copy) / (i + 1)))], dft_copy[::(i + 1)])
+
+            plt.plot(range(len(dft_copy)), dft_copy)
+            plt.show()
+
+            freq = np.argmax(dft)
 
         return freq * (SAMPLING_RATE / len(self.data))

@@ -24,3 +24,5 @@ ERROR_MARGIN = 0.1
 """Indicates how wide is the interval of accepted frequencies around perfect frequency of a tone."""
 
 BACKLOG_SIZE = 2
+
+MAX_DOWNSAMPLING = 4
