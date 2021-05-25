@@ -3,7 +3,6 @@ import copy
 import numpy as np
 import scipy.fftpack
 from models.constants import SAMPLING_RATE, LOW_FREQUENCY, HIGH_FREQUENCY, MAX_DOWNSAMPLING
-import matplotlib.pyplot as plt
 
 class Sample:
     def __init__(self, data: np.ndarray):
@@ -55,9 +54,6 @@ class Sample:
 
             for i in range(MAX_DOWNSAMPLING):
                 dft_copy = np.multiply(dft_copy[:int(np.ceil(len(dft_copy) / (i + 1)))], dft_copy[::(i + 1)])
-
-            plt.plot(range(len(dft_copy)), dft_copy)
-            plt.show()
 
             freq = np.argmax(dft)
 
