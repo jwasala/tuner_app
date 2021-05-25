@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Callable, List, Tuple
 import sounddevice as sd
 import numpy as np
-from models.constants import BLOCK_SIZE, SAMPLING_RATE, SECONDS_TO_TUNE
+from models.constants import BLOCK_SIZE, SAMPLING_RATE, SECONDS_TO_TUNE, BACKLOG_SIZE
 from models.pitch import Pitch
 from models.sample import Sample
 from models.tunings import TUNINGS
@@ -20,7 +20,13 @@ class TuningStatus:
 class Stream(sd.InputStream):
 
     def read_input(self, indata: np.ndarray, frames, time, status) -> None:
-        sample = Sample(indata)
+        if len(self.backlog) >= BACKLOG_SIZE * BLOCK_SIZE:
+            self.backlog = self.backlog[BLOCK_SIZE:]
+
+        self.backlog = np.append(self.backlog, indata)
+
+        sample = Sample(self.backlog)
+        print(sample.power)
         freq = sample.harmonic_product_spectrum()
 
         pitch = Pitch.from_frequency(freq)
@@ -45,3 +51,4 @@ class Stream(sd.InputStream):
         )
         self.update_view = update_view
         self.strings_status = [(string, 0) for string in TUNINGS['guitar']['standard']]
+        self.backlog = np.array([])

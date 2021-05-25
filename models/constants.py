@@ -7,7 +7,7 @@ _12TH_ROOT_OF_2 = 1.05946309436
 SAMPLING_RATE = 44100
 """Indicates how many samples are taken from input stream in a second."""
 
-BLOCK_SIZE = 44100
+BLOCK_SIZE = 11025
 """Indicates how often a callback function is called by the stream (as a number of samples passed with each call)."""
 
 HIGH_FREQUENCY = 700
@@ -22,3 +22,5 @@ consider that string to in tune. """
 
 ERROR_MARGIN = 0.1
 """Indicates how wide is the interval of accepted frequencies around perfect frequency of a tone."""
+
+BACKLOG_SIZE = 4

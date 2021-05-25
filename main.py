@@ -106,7 +106,7 @@ class Ui_MainWindow(object):
 
         self.over_tone = QFrame(self.centralwidget)
         self.over_tone.setObjectName(u"over_tone")
-        self.over_tone.setGeometry(QRect(350, 276, 301, 20))
+        self.over_tone.setGeometry(QRect(0, 0, 0, 0))
         self.over_tone.setAutoFillBackground(True)
         self.over_tone.setStyleSheet(u"#over_tone {\n"
                                      "	color: rgb(98, 139, 72);\n"
@@ -116,7 +116,7 @@ class Ui_MainWindow(object):
         self.over_tone.setFrameShape(QFrame.HLine)
         self.under_tone = QFrame(self.centralwidget)
         self.under_tone.setObjectName(u"under_tone")
-        self.under_tone.setGeometry(QRect(50, 276, 301, 20))
+        self.under_tone.setGeometry(QRect(0, 0, 0, 0))
         self.under_tone.setAutoFillBackground(True)
         self.under_tone.setStyleSheet(u"#under_tone {\n"
                                       "	color: rgba(237, 37,78, 255);\n"
@@ -152,7 +152,7 @@ def main():
 
     def update_view(ts: TuningStatus) -> None:
         print(ts.closest_pitch, ts.freq, 'Hz', f'({ts.freq_diff})', [(str(p), b) for (p, b) in ts.strings])
-        win.freq.setText("%.1f" % ts.freq + ' Hz')
+        win.freq.setText(str(int(ts.freq)) + ' Hz')
         win.closest_pitch.setText(str(ts.closest_pitch))
 
         if ts.freq_diff == 0:

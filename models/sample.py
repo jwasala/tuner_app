@@ -44,4 +44,4 @@ class Sample:
         if type(freq) == np.ndarray:
             freq = freq[0]
 
-        return freq
+        return freq * (SAMPLING_RATE / len(self.data))
