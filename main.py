@@ -1,314 +1,265 @@
 from models.stream import Stream, TuningStatus
 from models.tunings import TUNINGS
+
 import sys
-from PySide2.QtCore import (QCoreApplication, QMetaObject, QObject, QPoint,
-                            QRect, QSize, QUrl, Qt, Signal)
-from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
-                           QFontDatabase, QIcon, QLinearGradient, QPalette, QPainter, QPixmap,
-                           QRadialGradient)
+
+from PySide2.QtCore import QRect, QSize, Qt, Signal, Slot
 from PySide2.QtWidgets import *
 
 
+class MainWindow(QMainWindow):
+    freq_changed = Signal(int)
+    freq_diff_changed = Signal(float)
+    closest_pitch_changed = Signal(str)
+    strings_changed = Signal(list)
 
+    def __init__(self):
+        super(MainWindow, self).__init__()
+        self.resize(QSize(700, 600))
+        self.setMinimumSize(QSize(700, 600))
+        self.setMaximumSize(QSize(700, 600))
+        self.setWindowTitle('Tuner')
 
+        self.freq_changed.connect(self.update_freq)
+        self.freq_diff_changed.connect(self.update_freq_diff)
+        self.closest_pitch_changed.connect(self.update_closest_pitch)
+        self.strings_changed.connect(self.update_strings)
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        if MainWindow.objectName():
-            MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(700, 600)
-        MainWindow.setMinimumSize(QSize(700, 600))
-        MainWindow.setMaximumSize(QSize(700, 700))
-        MainWindow.setUnifiedTitleAndToolBarOnMac(False)
-        self.centralwidget = QWidget(MainWindow)
-        self.centralwidget.setObjectName(u"centralwidget")
-        self.centralwidget.setStyleSheet(u"#centralwidget {\n"
-                                         "	background: #011936;\n"
-                                         "}\n"
-                                         "\n"
-                                         "* {\n"
-                                         "	color: #ffffff;\n"
-                                         "}")
-        self.closest_pitch = QLabel(self.centralwidget)
-        self.closest_pitch.setObjectName(u"closest_pitch")
-        self.closest_pitch.setGeometry(QRect(50, 200, 601, 76))
-        font = QFont()
-        font.setFamily(u"Montserrat Black")
-        font.setPointSize(48)
-        self.closest_pitch.setFont(font)
-        self.closest_pitch.setStyleSheet(u"#closest_pitch {\n"
-                                         "	background: #ECBC4C;\n"
-                                         "	font-family: 'Montserrat Black';\n"
-                                         "}")
-        self.closest_pitch.setAlignment(Qt.AlignCenter)
-        self.freq = QLabel(self.centralwidget)
-        self.freq.setObjectName(u"freq")
-        self.freq.setGeometry(QRect(50, 50, 601, 126))
-        font1 = QFont()
-        font1.setFamily(u"Montserrat")
-        font1.setBold(700)
-        font1.setPointSize(90)
-        self.freq.setFont(font1)
-        self.freq.setStyleSheet(u"#freq {\n"
-                                "	background: qlineargradient(spread:pad, x1:0.5, y1:0.45, x2:0.5, y2:1, stop:0 rgba(31, 31, 31, 0), stop:0.001 rgba(237, 37,78, 255))\n"
-                                "}")
-        self.freq.setAlignment(Qt.AlignCenter)
-        self.buttons_grid = QWidget(self.centralwidget)
-        self.buttons_grid.setObjectName(u"buttons_grid")
-        self.buttons_grid.setGeometry(QRect(50, 425, 601, 126))
-        self.buttons_grid.setStyleSheet(u"#buttons_grid QPushButton {\n"
-                                        "	background: rgba(237, 37, 78, 0.3);\n"
-                                        "	border: 1px solid rgba(237, 37, 78, 0.5);\n"
-                                        "	border-radius: 16px;\n"
-                                        "	font: 14px 'Montserrat';\n"
-                                        "	font-weight: 450;\n"
-                                        "	margin: 5px;\n"
-                                        "	padding: 8px 5px;\n"
-                                        "}\n"
-                                        "#buttons_grid QPushButton:pressed {\n"
-                                        "	background: rgba(237, 37, 78, 0.8);\n"
-                                        "}")
-        self.buttons = QVBoxLayout(self.buttons_grid)
-        self.buttons.setObjectName(u"buttons")
-        self.buttons_row1 = QHBoxLayout()
-        self.buttons_row1.setObjectName(u"buttons_row1")
+        self.initialize_window()
 
-        self.guitar_st = QPushButton(self.buttons_grid)
-        self.guitar_st.setObjectName(u"guitar_st")
+    def initialize_window(self):
+        self.initialize_central_widget()
 
-        self.buttons_row1.addWidget(self.guitar_st)
-        self.ukulele_soprano = QPushButton(self.buttons_grid)
-        self.ukulele_soprano.setObjectName(u"ukulele_soprano")
+        self.initialize_closest_pitch()
 
-        self.buttons_row1.addWidget(self.ukulele_soprano)
+        self.initialize_freq()
 
-        self.guitar_half_down = QPushButton(self.buttons_grid)
-        self.guitar_half_down.setObjectName(u"guitar_half_down")
+        self.initialize_buttons_grid()
 
-        self.buttons_row1.addWidget(self.guitar_half_down)
+        self.initialize_over_and_under_tone()
 
-        self.buttons.addLayout(self.buttons_row1)
+        self.initialize_strings_grid()
 
-        self.buttons_row2 = QHBoxLayout()
-        self.buttons_row2.setObjectName(u"buttons_row2")
-        self.mandolin_standard = QPushButton(self.buttons_grid)
-        self.mandolin_standard.setObjectName(u"mandolin_standard")
+        self.setCentralWidget(self.central_widget)
 
-        self.buttons_row2.addWidget(self.mandolin_standard)
+    def initialize_central_widget(self):
+        self.central_widget = QWidget(self)
+        self.central_widget.setObjectName('central_widget')
+        self.central_widget.setStyleSheet(
+            """
+            #central_widget {
+                background: #011936;
+            }
 
-        self.bass_four_string = QPushButton(self.buttons_grid)
-        self.bass_four_string.setObjectName(u"bass_four_string")
+            * {
+                color: #fff;
+            }
+            """
+        )
 
-        self.buttons_row2.addWidget(self.bass_four_string)
+    def initialize_strings_grid(self):
+        self.strings_grid = QWidget(self.central_widget)
+        self.strings_grid.setObjectName('strings_grid')
+        self.strings_grid.setGeometry(QRect(50, 304, 601, 126))
+        self.strings_grid.setStyleSheet(
+            """
+            #strings_grid QPushButton {
+                background: rgba(98, 139, 72, 0.3);
+                border: 1px solid rgb(98, 139, 72);
+                border-radius: 17px;
+                font: 14px 'Montserrat';
+                font-weight: 450;
+                margin: 15px;
+                padding: 10px;
+            }
+            """
+        )
+        self.strings = QHBoxLayout(self.strings_grid)
+        self.strings.setObjectName('strings')
+        self.strings.setContentsMargins(9, 9, 9, 9)
+        for i, pitch in enumerate(TUNINGS['guitar standard']):
+            attr = f'string_{i}'
+            setattr(self, attr, QPushButton(self.strings_grid))
+            getattr(self, attr).setObjectName(attr)
+            getattr(self, attr).setText(str(pitch))
+            self.strings.addWidget(getattr(self, attr))
 
-        self.ukulele_baritone = QPushButton(self.buttons_grid)
-        self.ukulele_baritone.setObjectName(u"ukulele_baritone")
-
-        self.buttons_row2.addWidget(self.ukulele_baritone)
-
-        self.buttons.addLayout(self.buttons_row2)
-
-        self.over_tone = QFrame(self.centralwidget)
-        self.over_tone.setObjectName(u"over_tone")
+    def initialize_over_and_under_tone(self):
+        self.over_tone = QFrame(self.central_widget)
+        self.over_tone.setObjectName('over_tone')
         self.over_tone.setGeometry(QRect(0, 0, 0, 0))
         self.over_tone.setAutoFillBackground(True)
-        self.over_tone.setStyleSheet(u"#over_tone {\n"
-                                     "	color: rgb(98, 139, 72);\n"
-                                     "}")
+        self.over_tone.setStyleSheet(
+            """
+            #over_tone {
+                color: rgb(98, 139, 72);
+            }
+            """
+        )
         self.over_tone.setFrameShadow(QFrame.Plain)
         self.over_tone.setLineWidth(20)
         self.over_tone.setFrameShape(QFrame.HLine)
-        self.under_tone = QFrame(self.centralwidget)
-        self.under_tone.setObjectName(u"under_tone")
+        self.under_tone = QFrame(self.central_widget)
+        self.under_tone.setObjectName('under_tone')
         self.under_tone.setGeometry(QRect(0, 0, 0, 0))
         self.under_tone.setAutoFillBackground(True)
-        self.under_tone.setStyleSheet(u"#under_tone {\n"
-                                      "	color: rgba(237, 37,78, 255);\n"
-                                      "}")
+        self.under_tone.setStyleSheet(
+            """
+            #under_tone {
+                color: rgb(237, 37, 78);
+            }
+            """
+        )
         self.under_tone.setFrameShadow(QFrame.Plain)
         self.under_tone.setLineWidth(20)
         self.under_tone.setFrameShape(QFrame.HLine)
 
-        self.strings_grid = QWidget(self.centralwidget)
-        self.strings_grid.setObjectName(u"strings_grid")
-        self.strings_grid.setGeometry(QRect(50, 304, 601, 126))
-        self.strings_grid.setStyleSheet(u"#strings_grid QPushButton {\n"
-                                        "	background: rgba(98, 139, 72, 0.3);\n"
-                                        "	border: 1px solid rgb(98, 139, 72);\n"
-                                        "	border-radius: 17px;\n"
-                                        "	font: 14px 'Montserrat';\n"
-                                        "	font-weight: 450;\n"
-                                        "	margin: 15px;\n"
-                                        "	padding: 10px;\n"
-                                        "}")
+    def initialize_buttons_grid(self):
+        self.buttons_grid = QWidget(self.central_widget)
+        self.buttons_grid.setObjectName('buttons_grid')
+        self.buttons_grid.setGeometry(QRect(50, 425, 601, 126))
+        self.buttons_grid.setStyleSheet(
+            """
+            #buttons_grid QPushButton {
+                background: rgba(237, 37, 78, 0.3);
+                border: 1px solid rgba(237, 37, 78, 0.5);
+                border-radius: 16px;
+                font: 14px 'Montserrat';
+                font-weight: 450;
+                margin: 5px;
+                padding: 8px 5px;
+                }
+            #buttons_grid QPushButton:pressed {
+                background: rgba(237, 37, 78, 0.8);
+            }
+            """
+        )
+        self.buttons = QVBoxLayout(self.buttons_grid)
+        self.buttons.setObjectName('buttons')
+        self.buttons_row1 = QHBoxLayout()
+        self.buttons_row1.setObjectName('buttons_row1')
+        self.buttons_row2 = QHBoxLayout()
+        self.buttons_row2.setObjectName('buttons_row2')
+        for i, tuning in enumerate(TUNINGS):
+            attr = '_'.join(tuning.split())
+            setattr(self, attr, QPushButton(self.buttons_grid))
+            getattr(self, attr).setObjectName(attr)
+            getattr(self, attr).setText(tuning)
 
-        self.strings = QHBoxLayout(self.strings_grid)
-        self.strings.setObjectName(u"strings")
-        self.strings.setContentsMargins(9, 9, 9, 9)
-        self.string_1 = QPushButton(self.strings_grid)
-        self.string_1.setObjectName(u"string_1")
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.string_1.sizePolicy().hasHeightForWidth())
-        self.string_1.setSizePolicy(sizePolicy)
+            if i % 2 == 0:
+                self.buttons_row1.addWidget(getattr(self, attr))
+            else:
+                self.buttons_row2.addWidget(getattr(self, attr))
+        self.buttons.addLayout(self.buttons_row1)
+        self.buttons.addLayout(self.buttons_row2)
 
-        self.strings.addWidget(self.string_1)
+    def initialize_freq(self):
+        self.freq = QLabel(self.central_widget)
+        self.freq.setObjectName('freq')
+        self.freq.setGeometry(QRect(50, 50, 601, 126))
+        self.freq.setAlignment(Qt.AlignCenter)
+        self.freq.setText('440 Hz')
+        self.freq.setStyleSheet(
+            """
+            #freq {
+                background: qlineargradient(spread:pad, x1:0.5, y1:0.45, x2:0.5, y2:1, stop:0 rgba(31, 31, 31, 0), stop:0.001 rgba(237, 37,78, 255));
+                font-family: 'Montserrat';
+                font-size: 90px;
+                font-weight: 700;
+            }
+            """
+        )
 
-        self.string_2 = QPushButton(self.strings_grid)
-        self.string_2.setObjectName(u"string_2")
-        sizePolicy.setHeightForWidth(self.string_2.sizePolicy().hasHeightForWidth())
-        self.string_2.setSizePolicy(sizePolicy)
+    def initialize_closest_pitch(self):
+        self.closest_pitch = QLabel(self.central_widget)
+        self.closest_pitch.setObjectName('closest_pitch')
+        self.closest_pitch.setGeometry(QRect(50, 200, 601, 76))
+        self.closest_pitch.setText('A4')
+        self.closest_pitch.setAlignment(Qt.AlignCenter)
+        self.closest_pitch.setStyleSheet(
+            """
+            #closest_pitch {
+                background: #ecbc4c;
+                font-family: 'Montserrat Black';
+                font-size: 48px;
+            }
+            """
+        )
 
-        self.strings.addWidget(self.string_2)
+    @Slot(int)
+    def update_freq(self, freq):
+        self.freq.setText(f'{str(freq)} Hz')
 
-        self.string_3 = QPushButton(self.strings_grid)
-        self.string_3.setObjectName(u"string_3")
-        sizePolicy.setHeightForWidth(self.string_3.sizePolicy().hasHeightForWidth())
-        self.string_3.setSizePolicy(sizePolicy)
+    @Slot(str)
+    def update_closest_pitch(self, pitch):
+        self.closest_pitch.setText(pitch)
 
-        self.strings.addWidget(self.string_3)
-
-        self.string_4 = QPushButton(self.strings_grid)
-        self.string_4.setObjectName(u"string_4")
-        sizePolicy.setHeightForWidth(self.string_4.sizePolicy().hasHeightForWidth())
-        self.string_4.setSizePolicy(sizePolicy)
-
-        self.strings.addWidget(self.string_4)
-
-        self.string_5 = QPushButton(self.strings_grid)
-        self.string_5.setObjectName(u"string_5")
-        sizePolicy.setHeightForWidth(self.string_5.sizePolicy().hasHeightForWidth())
-        self.string_5.setSizePolicy(sizePolicy)
-
-        self.strings.addWidget(self.string_5)
-
-        self.string_6 = QPushButton(self.strings_grid)
-        self.string_6.setObjectName(u"string_6")
-        sizePolicy.setHeightForWidth(self.string_6.sizePolicy().hasHeightForWidth())
-        self.string_6.setSizePolicy(sizePolicy)
-
-        self.strings.addWidget(self.string_6)
-
-        MainWindow.setCentralWidget(self.centralwidget)
-
-        self.retranslateUi(MainWindow)
-
-        QMetaObject.connectSlotsByName(MainWindow)
-
-    def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Tuner", None))
-        self.closest_pitch.setText(QCoreApplication.translate("MainWindow", u"A4", None))
-        self.freq.setText(QCoreApplication.translate("MainWindow", u"440.0 Hz", None))
-        self.ukulele_soprano.setText(QCoreApplication.translate("MainWindow", u"Soprano ukulele", None))
-        self.guitar_half_down.setText(QCoreApplication.translate("MainWindow", u"Guitar half-step down", None))
-        self.guitar_st.setText(QCoreApplication.translate("MainWindow", u"Guitar standard", None))
-        self.mandolin_standard.setText(QCoreApplication.translate("MainWindow", u"Mandolin standard", None))
-        self.bass_four_string.setText(QCoreApplication.translate("MainWindow", u"4-string bass", None))
-        self.ukulele_baritone.setText(QCoreApplication.translate("MainWindow", u"Baritone ukulele", None))
-        self.string_1.setText(QCoreApplication.translate("MainWindow", u"E2", None))
-        self.string_2.setText(QCoreApplication.translate("MainWindow", u"A2", None))
-        self.string_3.setText(QCoreApplication.translate("MainWindow", u"D3", None))
-        self.string_4.setText(QCoreApplication.translate("MainWindow", u"G3", None))
-        self.string_5.setText(QCoreApplication.translate("MainWindow", u"B3", None))
-        self.string_6.setText(QCoreApplication.translate("MainWindow", u"E4", None))
-
-
-def main():
-    app = QApplication()
-    win = Ui_MainWindow()
-    w = QMainWindow()
-    win.setupUi(w)
-    w.show()
-
-    def update_view(ts: TuningStatus) -> None:
-        print(ts.closest_pitch, ts.freq, 'Hz', f'({ts.freq_diff})', [(str(p), b) for (p, b) in ts.strings])
-        win.freq.setText(str(int(ts.freq)) + ' Hz')
-        win.closest_pitch.setText(str(ts.closest_pitch))
-
-        if ts.freq_diff == 0:
+    @Slot(float)
+    def update_freq_diff(self, freq_diff):
+        if freq_diff == 0:
             win.over_tone.resize(0, win.over_tone.height())
             win.under_tone.resize(0, win.under_tone.height())
 
-        if ts.freq_diff > 0:
-            win.over_tone.setGeometry(350, 276, int(301 * abs(ts.freq_diff_normalized)), 20)
+        if freq_diff > 0:
+            win.over_tone.setGeometry(QRect(
+                350,
+                276,
+                int(301 * abs(freq_diff)),
+                20
+            ))
             win.under_tone.resize(0, win.under_tone.height())
 
-        if ts.freq_diff < 0:
-            win.under_tone.setGeometry(50 + (301 - int(301 * abs(ts.freq_diff_normalized))), 276,
-                                       int(301 * abs(ts.freq_diff_normalized)), 20)
+        if freq_diff < 0:
+            win.under_tone.setGeometry(QRect(
+                50 + (301 - int(301 * abs(freq_diff))),
+                276,
+                int(301 * abs(freq_diff)),
+                20
+            ))
             win.over_tone.resize(0, win.under_tone.height())
 
-        if len(ts.strings) == 4:
-            win.string_1.hide()
-            win.string_6.hide()
+    @Slot(list)
+    def update_strings(self, strings):
+        if len(strings) == 4:
+            win.string_4.hide()
+            win.string_5.hide()
 
-            i = 2
-            for (pitch, freq) in ts.strings:
-                getattr(win, f'string_{i}').setText(str(pitch))
-                getattr(win, f'string_{i}').setStyleSheet(u"#string_" + str(i) + " {\n"
-                                        "	background: qlineargradient(spread:pad, x1:0.5, y1:" + "%.2f" % (1 - freq) + ", x2:0.5, y2:1, stop:0 rgba(98, 139, 72, 0.3), stop:0.001 rgba(98, 139, 72, 1));\n"
-                                        "}")
-                i += 1
+        else:
+            win.string_4.show()
+            win.string_5.show()
 
-        if len(ts.strings) == 6:
-            win.string_1.show()
-            win.string_6.show()
+        for (i, (pitch, freq)) in enumerate(strings):
+            getattr(win, f'string_{i}').setText(str(pitch))
+            getattr(win, f'string_{i}').setStyleSheet(
+                f"""
+                #string_{str(i)} {{
+                    background: qlineargradient(spread:pad, x1:0.5, y1:{'%.2f' % (1 - freq)}, x2:0.5, y2:1, stop:0 rgba(98, 139, 72, 0.3), stop:0.001 rgba(98, 139, 72, 1));
+                }}
+                """
+            )
 
-            i = 1
-            for (pitch, freq) in ts.strings:
-                getattr(win, f'string_{i}').setText(str(pitch))
-                getattr(win, f'string_{i}').setStyleSheet(u"#string_" + str(i) + " {\n"
-                                        "	background: qlineargradient(spread:pad, x1:0.5, y1:" + "%.2f" % (1 - freq) + ", x2:0.5, y2:1, stop:0 rgba(98, 139, 72, 0.3), stop:0.001 rgba(98, 139, 72, 1));\n"
-                                        "}")
-                i += 1
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = MainWindow()
+    win.show()
+
+
+    def update_view(ts: TuningStatus):
+        win.freq_changed.emit(int(ts.freq))
+        win.closest_pitch_changed.emit(str(ts.closest_pitch))
+        win.freq_diff_changed.emit(ts.freq_diff_normalized)
+        win.strings_changed.emit(ts.strings)
+
 
     stream = Stream(update_view)
     stream.start()
 
-    def on_guitar_st_click(but):
-        return stream.update_instrument(TUNINGS['guitar standard'])
+    win.guitar_standard.clicked.connect(lambda: stream.update_instrument(TUNINGS['guitar standard']))
+    win.guitar_half_step_down.clicked.connect(lambda: stream.update_instrument(TUNINGS['guitar half step down']))
+    win.mandolin_standard.clicked.connect(lambda: stream.update_instrument(TUNINGS['mandolin standard']))
+    win.baritone_ukulele.clicked.connect(lambda: stream.update_instrument(TUNINGS['baritone ukulele']))
+    win.soprano_ukulele.clicked.connect(lambda: stream.update_instrument(TUNINGS['soprano ukulele']))
+    win.four_string_bass.clicked.connect(lambda: stream.update_instrument(TUNINGS['four string bass']))
 
-    def on_guitar_half_down_click(but):
-        return stream.update_instrument(TUNINGS['guitar half-step down'])
-
-    def on_mandolin_standard_click(but):
-        return stream.update_instrument(TUNINGS['mandolin standard'])
-
-    def on_ukulele_soprano_click(but):
-        return stream.update_instrument(TUNINGS['soprano ukulele'])
-
-    def on_ukulele_baritone_click(but):
-        return stream.update_instrument(TUNINGS['baritone ukulele'])
-
-    def on_bass_four_string(but):
-        return stream.update_instrument(TUNINGS['4-string bass'])
-
-    win.guitar_st.clicked.connect(on_guitar_st_click)
-    win.guitar_half_down.clicked.connect(on_guitar_half_down_click)
-    win.mandolin_standard.clicked.connect(on_mandolin_standard_click)
-    win.ukulele_soprano.clicked.connect(on_ukulele_soprano_click)
-    win.ukulele_baritone.clicked.connect(on_ukulele_baritone_click)
-    win.bass_four_string.clicked.connect(on_bass_four_string)
-
-    try:
-        sys.exit(app.exec_())
-    except:
-        print('Exiting')
-
-
-if __name__ == '__main__':
-    sys._excepthook = sys.excepthook
-
-    def my_exception_hook(exctype, value, traceback):
-        # Print the error and traceback
-        print(exctype, value, traceback)
-        # Call the normal Exception hook after
-        sys._excepthook(exctype, value, traceback)
-        sys.exit(1)
-
-
-    # Set the exception hook to our wrapping function
-    sys.excepthook = my_exception_hook
-
-    main()
+    sys.exit(app.exec_())

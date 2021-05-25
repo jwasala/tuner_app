@@ -21,6 +21,7 @@ class TuningStatus:
 class Stream(sd.InputStream):
 
     def update_instrument(self, tuning: List[Pitch]):
+        print('Updated tuning to ' + str([str(pitch) for pitch in tuning]))
         self.strings = tuning
         self.tunings = [0 for _ in self.strings]
 
@@ -31,7 +32,6 @@ class Stream(sd.InputStream):
         self.backlog = np.append(self.backlog, indata)
 
         sample = Sample(self.backlog)
-        print(sample.power)
         freq = sample.harmonic_product_spectrum()
 
         pitch = Pitch.from_frequency(freq)

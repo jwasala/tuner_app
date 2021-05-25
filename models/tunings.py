@@ -9,7 +9,7 @@ TUNINGS = {
         Pitch(Note.B, 3),
         Pitch(Note.E, 4)
     ],
-    'guitar half-step down': [
+    'guitar half step down': [
         Pitch(Note.DSharp, 2),
         Pitch(Note.GSharp, 2),
         Pitch(Note.CSharp, 3),
@@ -35,7 +35,7 @@ TUNINGS = {
         Pitch(Note.B, 3),
         Pitch(Note.E, 4)
     ],
-    '4-string bass': [
+    'four string bass': [
         Pitch(Note.E, 1),
         Pitch(Note.A, 1),
         Pitch(Note.D, 2),
