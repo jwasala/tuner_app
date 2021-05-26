@@ -1,8 +1,9 @@
 import copy
+import math
 
 import numpy as np
 import scipy.fftpack
-from models.constants import SAMPLING_RATE, LOW_FREQUENCY, MAX_DOWNSAMPLING
+from models.constants import HIGH_FREQUENCY, SAMPLING_RATE, LOW_FREQUENCY, MAX_DOWNSAMPLING, BACKLOG_SIZE, BLOCK_SIZE
 
 
 class Sample:
@@ -31,31 +32,59 @@ class Sample:
         for i in range(LOW_FREQUENCY):
             dft[i] = 0
 
-        return dft[:len(dft) // 2, HIGH_FREQUENCY]
+        return dft[:min(len(dft) // 2, HIGH_FREQUENCY)]
 
-    def harmonic_product_spectrum(self, simple=True) -> float:
+    def harmonic_product_spectrum(self) -> float:
         """
         Estimates frequency of the sample using Harmonic Product Spectrum.
 
         :return: Estimated frequency.
         """
-        if simple:
-            freq = np.argmax(self.discrete_fourier_transform())
-        else:
-            window = np.hanning(len(self.data))
-            flat_data = self.data.flatten()
-            dft = abs(scipy.fftpack.fft(flat_data * window))
+        window = np.hanning(len(self.data)) * self.data.flatten()
+        rate = 1 / self.duration
 
-            # ignore hum
-            for i in range(LOW_FREQUENCY):
-                dft[i] = 0
-            dft = dft[:len(dft) // 2]
+        dft = abs(scipy.fftpack.fft(window)[:len(window) // 2])
+        dft = self.reduce_white_noise(dft, rate)
+        dft = self.interpolate_spectrum(dft)
 
-            dft_copy = copy.deepcopy(dft)
+        product_spectrum = copy.deepcopy(dft)
 
-            for i in range(MAX_DOWNSAMPLING):
-                dft_copy = np.multiply(dft_copy[:int(np.ceil(len(dft_copy) / (i + 1)))], dft_copy[::(i + 1)])
+        for start in range(MAX_DOWNSAMPLING):
+            product_spectrum = np.multiply(product_spectrum[:int(np.ceil(len(dft) / (start + 1)))], dft[::(start + 1)])
 
-            freq = np.argmax(dft)
+        return np.argmax(product_spectrum) * rate / MAX_DOWNSAMPLING
 
-        return freq * (SAMPLING_RATE / len(self.data))
+    @classmethod
+    def interpolate_spectrum(cls, dft):
+        """
+        Interpolates spectrum.
+        """
+        dft = np.interp(np.arange(0, len(dft), 1 / MAX_DOWNSAMPLING), np.arange(0, len(dft)), dft)
+        dft = dft / np.linalg.norm(dft, ord=2)
+        return dft
+
+    @classmethod
+    def reduce_white_noise(cls, dft, rate):
+        """
+        Reduces white noise from the sample.
+
+        :param dft: Vector of samples after applying DFT
+        :param rate: reverse of duration of the sample
+        :return: noise-reducted vector
+        """
+        for i in range(int(LOW_FREQUENCY / rate)):
+            dft[i] = 0
+
+        octaves = [50 * i for i in range(1, 11)]
+
+        for j in range(len(octaves) - 1):
+            start = int(octaves[j] / rate)
+            end = int(octaves[j + 1] / rate)
+            end = end if len(dft) > end else len(dft)
+            power_freq = (np.linalg.norm(dft[start:end], ord=2) ** 2) / (end - start)
+            power_freq = math.sqrt(power_freq)
+
+            for start in range(start, end):
+                dft[start] = dft[start] if dft[start] > power_freq else 0
+
+        return dft

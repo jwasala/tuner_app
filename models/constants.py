@@ -13,10 +13,10 @@ BLOCK_SIZE = 22050
 HIGH_FREQUENCY = 700
 """Highest frequency considered when estimating sound frequency."""
 
-LOW_FREQUENCY = 80
+LOW_FREQUENCY = 60
 """Lowest frequency considered when estimating sound frequency."""
 
-SECONDS_TO_TUNE = 4
+SECONDS_TO_TUNE = 2
 """Indicates how long input sound's frequency have to fit within error margin of a string's pitch in order to 
 consider that string to in tune. """
 

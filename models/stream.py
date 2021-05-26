@@ -31,6 +31,9 @@ class Stream(sd.InputStream):
 
         self.backlog = np.append(self.backlog, indata)
 
+        if len(self.backlog) != BACKLOG_SIZE * BLOCK_SIZE:
+            return
+
         sample = Sample(self.backlog)
         freq = sample.harmonic_product_spectrum()
 
