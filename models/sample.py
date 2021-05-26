@@ -60,8 +60,7 @@ class Sample:
         Interpolates spectrum.
         """
         dft = np.interp(np.arange(0, len(dft), 1 / MAX_DOWNSAMPLING), np.arange(0, len(dft)), dft)
-        dft = dft / np.linalg.norm(dft, ord=2)
-        return dft
+        return dft / np.linalg.norm(dft, ord=2)
 
     @classmethod
     def reduce_white_noise(cls, dft, rate):
@@ -79,10 +78,8 @@ class Sample:
 
         for j in range(len(octaves) - 1):
             start = int(octaves[j] / rate)
-            end = int(octaves[j + 1] / rate)
-            end = end if len(dft) > end else len(dft)
-            power_freq = (np.linalg.norm(dft[start:end], ord=2) ** 2) / (end - start)
-            power_freq = math.sqrt(power_freq)
+            end = min(int(octaves[j + 1] / rate), len(dft))
+            power_freq = math.sqrt((np.linalg.norm(dft[start:end], ord=2) ** 2) / (end - start))
 
             for start in range(start, end):
                 dft[start] = dft[start] if dft[start] > power_freq else 0
