@@ -2,7 +2,8 @@ import copy
 
 import numpy as np
 import scipy.fftpack
-from models.constants import SAMPLING_RATE, LOW_FREQUENCY, HIGH_FREQUENCY, MAX_DOWNSAMPLING
+from models.constants import SAMPLING_RATE, LOW_FREQUENCY, MAX_DOWNSAMPLING
+
 
 class Sample:
     def __init__(self, data: np.ndarray):
@@ -30,9 +31,9 @@ class Sample:
         for i in range(LOW_FREQUENCY):
             dft[i] = 0
 
-        return dft[:min(len(dft) // 2, HIGH_FREQUENCY)]
+        return dft[:len(dft) // 2, HIGH_FREQUENCY]
 
-    def harmonic_product_spectrum(self, simple=False) -> float:
+    def harmonic_product_spectrum(self, simple=True) -> float:
         """
         Estimates frequency of the sample using Harmonic Product Spectrum.
 

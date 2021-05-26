@@ -24,5 +24,7 @@ ERROR_MARGIN = 0.1
 """Indicates how wide is the interval of accepted frequencies around perfect frequency of a tone."""
 
 BACKLOG_SIZE = 2
+"""Indicates how many blocks of input are kept in memory and considered in process of estimating frequency."""
 
 MAX_DOWNSAMPLING = 4
+"""Indicates number of epochs for HPS algorithm."""
