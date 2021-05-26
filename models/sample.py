@@ -3,7 +3,7 @@ import math
 
 import numpy as np
 import scipy.fftpack
-from models.constants import HIGH_FREQUENCY, SAMPLING_RATE, LOW_FREQUENCY, MAX_DOWNSAMPLING, BACKLOG_SIZE, BLOCK_SIZE
+from models.constants import HIGH_FREQUENCY, SAMPLING_RATE, LOW_FREQUENCY, MAX_DOWNSAMPLING
 
 
 class Sample:
